@@ -24,7 +24,7 @@ export const Route = createFileRoute('/parks/$parkId')({
 function ParkLiveData() {
   const data: EntityLiveDataResponse = Route.useLoaderData();
   return (
-    <div className="max-w-lg mx-auto px-4 py-8">
+    <div className="max-w-xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">{data.name}</h1>
       <RideWaitTimeList liveData={data.liveData} />
     </div>

@@ -10,11 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ParksIndexRouteImport } from './routes/parks.index'
 import { Route as ParksParkIdRouteImport } from './routes/parks.$parkId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ParksIndexRoute = ParksIndexRouteImport.update({
+  id: '/parks/',
+  path: '/parks/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ParksParkIdRoute = ParksParkIdRouteImport.update({
@@ -26,27 +32,31 @@ const ParksParkIdRoute = ParksParkIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/parks/$parkId': typeof ParksParkIdRoute
+  '/parks': typeof ParksIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/parks/$parkId': typeof ParksParkIdRoute
+  '/parks': typeof ParksIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/parks/$parkId': typeof ParksParkIdRoute
+  '/parks/': typeof ParksIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/parks/$parkId'
+  fullPaths: '/' | '/parks/$parkId' | '/parks'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/parks/$parkId'
-  id: '__root__' | '/' | '/parks/$parkId'
+  to: '/' | '/parks/$parkId' | '/parks'
+  id: '__root__' | '/' | '/parks/$parkId' | '/parks/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ParksParkIdRoute: typeof ParksParkIdRoute
+  ParksIndexRoute: typeof ParksIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -56,6 +66,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/parks/': {
+      id: '/parks/'
+      path: '/parks'
+      fullPath: '/parks'
+      preLoaderRoute: typeof ParksIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/parks/$parkId': {
@@ -71,6 +88,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ParksParkIdRoute: ParksParkIdRoute,
+  ParksIndexRoute: ParksIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

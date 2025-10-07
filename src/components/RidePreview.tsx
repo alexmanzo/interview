@@ -35,7 +35,7 @@ export default function RidePreview({ ride }: RidePreviewProps) {
           </span>
         </div>
         <div className="flex flex-col gap-3 justify-center">
-          <CardTitle className="self-center text-right">{ride.name}</CardTitle>
+          <CardTitle className="self-center text-right leading-tight">{ride.name}</CardTitle>
           <Badge variant="secondary" className="ml-auto">
             {lastUpdated}
           </Badge>
