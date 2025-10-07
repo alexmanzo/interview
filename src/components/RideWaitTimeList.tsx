@@ -1,17 +1,17 @@
 import RidePreview from './RidePreview';
 import type { EntityLiveData } from '@/types/parks-api';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { useContext, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ArrowDownIcon, ArrowUpIcon } from 'lucide-react';
 import { Button } from './ui/button';
 import spacetime from 'spacetime';
 import { Input } from '@/components/ui/input';
-import { TimezoneContext } from '@/context/timezone';
+import { useTimezone } from '@/hooks/useTimezone';
 
 type SortCategory = 'waitTime' | 'name' | 'lastUpdatedMinutes';
 
 export default function RideWaitTimeList({ liveData }: { liveData: Array<EntityLiveData> }) {
-  const parkTimeZone = useContext(TimezoneContext)
+  const { timezone } = useTimezone();
   const [searchTerm, setSearchTerm] = useState('');
   const [sort, setSort] = useState<{ direction: 'asc' | 'desc'; category: SortCategory }>({
     direction: 'asc',
@@ -19,11 +19,10 @@ export default function RideWaitTimeList({ liveData }: { liveData: Array<EntityL
   });
 
   const rideData = useMemo(() => {
-    console.log(parkTimeZone)
     return liveData.map((ride) => {
       const waitTime = ride.queue?.STANDBY?.waitTime || null;
       const lastUpdated = spacetime(ride.lastUpdated);
-      const now = spacetime.now(parkTimeZone);
+      const now = spacetime.now(timezone || 'America/New_York');
       const diff = lastUpdated.diff(now);
       let lastUpdatedMinutes = 0;
       if (diff.hours > 0) lastUpdatedMinutes = diff.hours * 60;

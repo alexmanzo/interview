@@ -8,8 +8,10 @@ import {
   HOLLYWOOD_STUDIOS_ENTITY_ID,
   MAGIC_KINGDOM_ENTITY_ID,
 } from '@/constants';
+import { useTimezone } from '@/hooks/useTimezone';
 import type { EntityLiveDataResponse } from '@/types/parks-api';
 import { createFileRoute, Link } from '@tanstack/react-router';
+import { useEffect } from 'react';
 
 export const Route = createFileRoute('/')({
   loader: ({ context: { queryClient } }) => {
@@ -24,6 +26,11 @@ export const Route = createFileRoute('/')({
 
 function App() {
   const { liveData, timezone }: EntityLiveDataResponse = Route.useLoaderData();
+  const { setTimezone } = useTimezone();
+
+  useEffect(() => {
+    setTimezone(timezone);
+  }, [setTimezone, timezone]);
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
