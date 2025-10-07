@@ -1,7 +1,7 @@
 import RidePreview from './RidePreview';
 import type { EntityLiveData } from '@/types/parks-api';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { ArrowDownIcon, ArrowUpIcon } from 'lucide-react';
 import { Button } from './ui/button';
 import spacetime from 'spacetime';
@@ -18,18 +18,26 @@ export default function RideWaitTimeList({ liveData }: { liveData: Array<EntityL
     category: 'lastUpdatedMinutes',
   });
 
-  const rideData = useMemo(() => {
-    const mappedData = liveData.map((ride) => {
-      const waitTime = ride.queue?.STANDBY?.waitTime || null;
+  const calcLastUpdated = useCallback(
+    (ride: EntityLiveData) => {
       const lastUpdated = spacetime(ride.lastUpdated);
       const now = spacetime.now(timezone || 'America/New_York');
       const diff = lastUpdated.diff(now);
-      let lastUpdatedMinutes = 0;
-      if (diff.hours > 0) lastUpdatedMinutes = diff.hours * 60;
-      if (diff.minutes > 0) lastUpdatedMinutes += diff.minutes;
-      return { ...ride, waitTime, lastUpdatedMinutes };
+      if (diff.hours > 0) {
+        return diff.hours * 60 + diff.minutes;
+      } else {
+        return diff.minutes;
+      }
+    },
+    [timezone]
+  );
+
+  const rideData = useMemo(() => {
+    const mappedData = liveData.map((ride) => {
+      const waitTime = ride.queue?.STANDBY?.waitTime || null;
+      return { ...ride, waitTime, lastUpdatedMinutes: calcLastUpdated(ride) };
     });
-    const openRides = mappedData.filter((ride) => ride.status === 'OPERATING') || [];
+    const openRides = mappedData.filter((ride) => ride.status === 'OPERATING' && ride.waitTime) || [];
 
     return openRides;
   }, [liveData]);
@@ -72,30 +80,32 @@ export default function RideWaitTimeList({ liveData }: { liveData: Array<EntityL
         <Input
           type="text"
           placeholder="Search for a ride"
+          aria-label="Search for a ride"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-2/3"
+          className="max-w-1/2"
         />
-
-        <Select value={sort.category} onValueChange={(onSortCategoryChange)} aria-label="Sort by">
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Sort by..." />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="waitTime">Wait time</SelectItem>
-            <SelectItem value="name">Name</SelectItem>
-            <SelectItem value="lastUpdatedMinutes">Last Updated</SelectItem>
-          </SelectContent>
-        </Select>
-        <Button
-          variant="outline"
-          size="icon"
-          aria-label={sort.direction === 'asc' ? 'Sort descending' : 'Sort ascending'}
-          onClick={() => setSort({ ...sort, direction: sort.direction === 'asc' ? 'desc' : 'asc' })}
-        >
-          {sort.direction === 'asc' && <ArrowUpIcon />}
-          {sort.direction === 'desc' && <ArrowDownIcon />}
-        </Button>
+        <div className="flex gap-1.5 justify-between items-center">
+          <Select value={sort.category} onValueChange={onSortCategoryChange} aria-label="Sort by">
+            <SelectTrigger className="min-w-[140px]">
+              <SelectValue placeholder="Sort by..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="waitTime">Wait time</SelectItem>
+              <SelectItem value="name">Name</SelectItem>
+              <SelectItem value="lastUpdatedMinutes">Last Updated</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button
+            variant="outline"
+            size="icon"
+            aria-label={sort.direction === 'asc' ? 'Sort descending' : 'Sort ascending'}
+            onClick={() => setSort({ ...sort, direction: sort.direction === 'asc' ? 'desc' : 'asc' })}
+          >
+            {sort.direction === 'asc' && <ArrowUpIcon />}
+            {sort.direction === 'desc' && <ArrowDownIcon />}
+          </Button>
+        </div>
       </div>
 
       <div className="flex flex-col gap-4">

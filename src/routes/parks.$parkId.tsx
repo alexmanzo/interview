@@ -10,7 +10,6 @@ export const Route = createFileRoute('/parks/$parkId')({
       queryFn: () => getLiveData(parkId),
     });
   },
-  // errorComponent: PostErrorComponent,
   component: ParkLiveData,
 });
 

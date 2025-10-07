@@ -5,7 +5,7 @@ import { Badge } from './ui/badge';
 
 export default function ParkPreview({ park }: { park: EntityLiveData }) {
   const statusText = park.status === 'OPERATING' ? 'Open' : 'Closed';
-  const badgeVariant = park.status === 'OPERATING' ? 'open' : 'closed';
+  const badgeVariant = statusText.toLowerCase() as 'open' | 'closed';
 
   return (
     <Link to="/parks/$parkId" params={{ parkId: park.id }} className="rounded-xl">
