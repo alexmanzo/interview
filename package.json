@@ -9,7 +9,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@radix-ui/react-separator": "^1.1.7",
+    "@radix-ui/react-slot": "^1.2.3",
     "@tailwindcss/vite": "^4.0.6",
     "@tanstack/nitro-v2-vite-plugin": "^1.132.31",
     "@tanstack/react-devtools": "^0.7.0",
@@ -22,6 +22,7 @@
     "lucide-react": "^0.545.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "spacetime": "^7.11.0",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.0.6"
   },
