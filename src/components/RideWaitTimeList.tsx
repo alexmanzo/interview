@@ -79,7 +79,7 @@ export default function RideWaitTimeList({ liveData }: { liveData: Array<EntityL
       <div className="flex gap-1.5 justify-between items-center mb-3">
         <Input
           type="text"
-          placeholder="Space mountain"
+          placeholder="Search for a ride"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-2/3"
