@@ -14,13 +14,6 @@ export const Route = createFileRoute('/parks/$parkId')({
   component: ParkLiveData,
 });
 
-// export const Route = createFileRoute('/parks/$parkId')({
-//   loader: () => {
-//     return 'Hello World';
-//   },
-//   component: ParkLiveData,
-// });
-
 function ParkLiveData() {
   const data: EntityLiveDataResponse = Route.useLoaderData();
   return (

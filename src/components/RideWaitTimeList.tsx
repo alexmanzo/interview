@@ -19,7 +19,7 @@ export default function RideWaitTimeList({ liveData }: { liveData: Array<EntityL
   });
 
   const rideData = useMemo(() => {
-    return liveData.map((ride) => {
+    const mappedData = liveData.map((ride) => {
       const waitTime = ride.queue?.STANDBY?.waitTime || null;
       const lastUpdated = spacetime(ride.lastUpdated);
       const now = spacetime.now(timezone || 'America/New_York');
@@ -29,24 +29,13 @@ export default function RideWaitTimeList({ liveData }: { liveData: Array<EntityL
       if (diff.minutes > 0) lastUpdatedMinutes += diff.minutes;
       return { ...ride, waitTime, lastUpdatedMinutes };
     });
+    const openRides = mappedData.filter((ride) => ride.status === 'OPERATING') || [];
+
+    return openRides;
   }, [liveData]);
 
-  const openRides = useMemo(
-    () => rideData.filter((ride) => ride.status === 'OPERATING' && !!ride.queue?.STANDBY?.waitTime) || [],
-    rideData
-  );
-
-  const filteredRides = useMemo(
-    () =>
-      openRides.filter((ride) => {
-        if (!searchTerm) return true;
-        return ride.name.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase());
-      }),
-    [searchTerm, openRides]
-  );
-
   const sortedRides = useMemo(() => {
-    return filteredRides.sort((a, b) => {
+    return [...rideData].sort((a, b) => {
       let aValue: number | string = 0;
       let bValue: number | string = 0;
       switch (sort.category) {
@@ -71,11 +60,12 @@ export default function RideWaitTimeList({ liveData }: { liveData: Array<EntityL
       if (aValue > bValue) return sort.direction === 'asc' ? 1 : -1;
       return 0;
     });
-  }, [sort, filteredRides]);
+  }, [rideData, sort]);
 
   function onSortCategoryChange(value: SortCategory) {
     setSort({ ...sort, category: value });
   }
+
   return (
     <>
       <div className="flex gap-1.5 justify-between items-center mb-3">
@@ -87,7 +77,7 @@ export default function RideWaitTimeList({ liveData }: { liveData: Array<EntityL
           className="w-2/3"
         />
 
-        <Select value={sort.category} onValueChange={onSortCategoryChange} aria-label="Sort by">
+        <Select value={sort.category} onValueChange={(onSortCategoryChange)} aria-label="Sort by">
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Sort by..." />
           </SelectTrigger>
@@ -109,7 +99,8 @@ export default function RideWaitTimeList({ liveData }: { liveData: Array<EntityL
       </div>
 
       <div className="flex flex-col gap-4">
-        {openRides.length > 0 && sortedRides.map((item) => <RidePreview key={item.id} ride={item} />)}
+        {sortedRides.length > 0 && sortedRides.map((item) => <RidePreview key={item.id} ride={item} />)}
+        {sortedRides.length === 0 && <p className="text-center p-10 text-lg">No ride wait times available.</p>}
       </div>
     </>
   );
