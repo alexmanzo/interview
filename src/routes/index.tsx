@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import ParkSearch from '@/components/ParkSearch';
+import Child from '@/components/Child';
 
 export const Route = createFileRoute('/')({
   component: App,
@@ -12,6 +12,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <h1>The app</h1>
+      <Child />
     </QueryClientProvider>
   );
 }
