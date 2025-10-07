@@ -20,7 +20,7 @@ export default function MainNavigation() {
     <NavigationMenu className="py-2 border-b border-slate-200">
       <NavigationMenuList className="max-w-2xl mx-auto flex gap-4 ">
         {routes.map((route) => (
-          <NavigationMenuItem key={route.to}>
+          <NavigationMenuItem key={route.params?.parkId ?? route.to}>
             <NavigationMenuLink asChild>
               <Link to={route.to} params={route.params} className="group">
                 <span className="group-[&.active]:border-b border-slate-400">{route.name}</span>
