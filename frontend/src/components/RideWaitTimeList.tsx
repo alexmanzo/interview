@@ -38,9 +38,10 @@ export default function RideWaitTimeList({ liveData }: { liveData: Array<EntityL
       return { ...ride, waitTime, lastUpdatedMinutes: calcLastUpdated(ride) };
     });
     const openRides = mappedData.filter((ride) => ride.status === 'OPERATING' && ride.waitTime) || [];
+    const filteredRides = openRides.filter((ride) => ride.name.toLowerCase().includes(searchTerm.toLowerCase().trim()));
 
-    return openRides;
-  }, [liveData]);
+    return filteredRides;
+  }, [liveData, searchTerm, calcLastUpdated]);
 
   const sortedRides = useMemo(() => {
     return [...rideData].sort((a, b) => {
