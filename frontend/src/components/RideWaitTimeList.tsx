@@ -6,12 +6,10 @@ import { ArrowDownIcon, ArrowUpIcon } from 'lucide-react';
 import { Button } from './ui/button';
 import spacetime from 'spacetime';
 import { Input } from '@/components/ui/input';
-import { useTimezone } from '@/hooks/useTimezone';
 
 type SortCategory = 'waitTime' | 'name' | 'lastUpdatedMinutes';
 
-export default function RideWaitTimeList({ liveData }: { liveData: Array<EntityLiveData> }) {
-  const { timezone } = useTimezone();
+export default function RideWaitTimeList({ liveData, timezone }: { liveData: Array<EntityLiveData>, timezone: string }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [sort, setSort] = useState<{ direction: 'asc' | 'desc'; category: SortCategory }>({
     direction: 'asc',
@@ -21,8 +19,9 @@ export default function RideWaitTimeList({ liveData }: { liveData: Array<EntityL
   const calcLastUpdated = useCallback(
     (ride: EntityLiveData) => {
       const lastUpdated = spacetime(ride.lastUpdated);
-      const now = spacetime.now(timezone || 'America/New_York');
+      const now = spacetime.now(timezone);
       const diff = lastUpdated.diff(now);
+
       if (diff.hours > 0) {
         return diff.hours * 60 + diff.minutes;
       } else {

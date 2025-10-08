@@ -1,9 +1,7 @@
 import { getLiveParkData } from '@/api/parks';
 import ParkPreview from '@/components/ParkPreview';
-import { useTimezone } from '@/hooks/useTimezone';
 import type { EntityLiveDataResponse } from '@/types/parks-api';
 import { createFileRoute } from '@tanstack/react-router';
-import { useEffect } from 'react';
 
 export const Route = createFileRoute('/')({
   loader: ({ context: { queryClient } }) => {
@@ -12,17 +10,11 @@ export const Route = createFileRoute('/')({
       queryFn: () => getLiveParkData(),
     });
   },
-  // errorComponent: PostErrorComponent,
   component: App,
 });
 
 function App() {
-  const { liveData, timezone }: EntityLiveDataResponse = Route.useLoaderData();
-  const { setTimezone } = useTimezone();
-
-  useEffect(() => {
-    setTimezone(timezone);
-  }, [setTimezone, timezone]);
+  const { liveData }: EntityLiveDataResponse = Route.useLoaderData();
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
