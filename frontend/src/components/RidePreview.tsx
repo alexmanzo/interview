@@ -47,14 +47,14 @@ export default function RidePreview({ ride }: RidePreviewProps) {
     <Card>
       <CardContent className="flex justify-between gap-3">
         <div className="inline-flex w-20 h-20">
-          <span className={cn(waitTimeVariants({ variant: waitTimeVariant }))}>
-            <span className="text-3xl font-medium">{ride.waitTime || '-'}</span>
+          <span className={cn(waitTimeVariants({ variant: waitTimeVariant }))} data-testid="wait-time">
+            <span className="text-3xl font-medium" >{ride.waitTime || '-'}</span>
             <span>min</span>
           </span>
         </div>
         <div className="flex flex-col gap-3 justify-center">
-          <CardTitle className="self-center text-right leading-tight text-sm lg:text-lg">{ride.name}</CardTitle>
-          <Badge variant="secondary" className="ml-auto">
+          <CardTitle className="self-center text-right leading-tight text-sm lg:text-lg" data-testid="ride-name">{ride.name}</CardTitle>
+          <Badge variant="secondary" className="ml-auto" data-testid="last-updated">
             {lastUpdated}
           </Badge>
         </div>
