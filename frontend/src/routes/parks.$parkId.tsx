@@ -1,4 +1,5 @@
 import { getLiveData } from '@/api/parks';
+import ErrorDisplay from '@/components/ErrorDisplay';
 import RideWaitTimeList from '@/components/RideWaitTimeList';
 import { Button } from '@/components/ui/button';
 import type { EntityLiveDataResponse } from '@/types/parks-api';
@@ -26,10 +27,7 @@ function ParkLiveData() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
       {error && (
-        <div className="p-8 flex flex-col gap-4 items-center justify-center text-center">
-          <h1 className="text-2xl">{error.status} - {error.message}</h1>
-          <Button asChild><Link to="/">Return to home</Link></Button>
-        </div>
+        <ErrorDisplay error={error} />
       )}
       {data && (
         <>

@@ -3,29 +3,44 @@ import ParkPreview from '@/components/ParkPreview';
 import { WALT_DISNEY_ENTITY_ID } from '@/constants';
 import type { EntityLiveDataResponse, LiveDataParams } from '@/types/parks-api';
 import { createFileRoute } from '@tanstack/react-router';
+import { useQuery } from '@tanstack/react-query';
+import ErrorDisplay from '@/components/ErrorDisplay';
+
+const params: LiveDataParams = { parkId: WALT_DISNEY_ENTITY_ID, entityType: 'PARK' };
 
 export const Route = createFileRoute('/')({
-  loader: ({ context: { queryClient } }) => {
-    const params: LiveDataParams = { parkId: WALT_DISNEY_ENTITY_ID, entityType: 'PARK' };
-    return queryClient.ensureQueryData({
-      queryKey: ['liveData', params],
-      queryFn: () => getLiveData(params),
-    });
+  beforeLoad: () => {
+    return {
+      parkQueryOptions: { queryKey: ['liveData', params], queryFn: () => getLiveData(params) },
+    };
+  },
+  loader: async ({ context: { queryClient, parkQueryOptions } }) => {
+    queryClient.prefetchQuery(parkQueryOptions);
   },
   component: App,
 });
 
 function App() {
-  const { liveData }: EntityLiveDataResponse = Route.useLoaderData();
+  const { parkQueryOptions } = Route.useRouteContext();
+  const { data, error, isPending } = useQuery<EntityLiveDataResponse>(parkQueryOptions);
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold">Wait times at Walt Disney World Resort &reg;</h1>
-      <p className="mt-4 mb-6">Select a park below for live updates on ride wait times!</p>
-      <div className="grid md:grid-cols-2 gap-4 justify-stretch">
-        {liveData.length > 0 && liveData.map((park) => <ParkPreview key={park.id} park={park} />)}
-        {liveData.length === 0 && <p className="text-center p-10 text-lg">No park data available.</p>}
-      </div>
+      {error && <ErrorDisplay error={error} showLink={false} />}
+      {data && (
+        <>
+          <h1 className="text-3xl font-bold">Wait times at Walt Disney World Resort &reg;</h1>
+          <p className="mt-4 mb-6">Select a park below for live updates on ride wait times!</p>
+          <div className="grid md:grid-cols-2 gap-4 justify-stretch">
+            {data.liveData && (
+              <>
+                {data.liveData.length > 0 && data.liveData.map((park) => <ParkPreview key={park.id} park={park} />)}
+                {data.liveData.length === 0 && <p className="text-center p-10 text-lg">No park data available.</p>}
+              </>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }
