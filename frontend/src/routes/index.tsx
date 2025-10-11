@@ -5,6 +5,7 @@ import type { EntityLiveDataResponse, LiveDataParams } from '@/types/parks-api';
 import { createFileRoute } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import ErrorDisplay from '@/components/ErrorDisplay';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const params: LiveDataParams = { parkId: WALT_DISNEY_ENTITY_ID, entityType: 'PARK' };
 
@@ -26,6 +27,20 @@ function App() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
+      {isPending && (
+        <>
+          <Skeleton className="h-12 w-3/4 mb-4" />
+          <Skeleton className="h-6 w-3/4 mb-6" />
+          <div className="grid md:grid-cols-2 gap-4 justify-stretch">
+            <Skeleton className="w-[382px] md:w-[312px] h-[132px]" />
+            <Skeleton className="w-[382px] md:w-[312px] h-[132px]" />
+            <Skeleton className="w-[382px] md:w-[312px] h-[132px]" />
+            <Skeleton className="w-[382px] md:w-[312px] h-[132px]" />
+            <Skeleton className="w-[382px] md:w-[312px] h-[132px]" />
+            <Skeleton className="w-[382px] md:w-[312px] h-[132px]" />
+          </div>
+        </>
+      )}
       {error && <ErrorDisplay error={error} showLink={false} />}
       {data && (
         <>
