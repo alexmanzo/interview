@@ -1,4 +1,5 @@
 export type EntityType = 'DESTINATION' | 'PARK' | 'ATTRACTION' | 'RESTAURANT' | 'HOTEL' | 'SHOW';
+import { ParksApiError } from '@/types/parks-api';
 export type LiveStatusType = 'OPERATING' | 'DOWN' | 'CLOSED' | 'REFURBISHMENT';
 
 export type LiveQueue = {
