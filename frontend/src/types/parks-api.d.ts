@@ -40,3 +40,8 @@ export type EntityLiveDataResponse = {
   timezone: string;
   liveData: Array<EntityLiveData>
 }
+
+export type LiveDataParams = {
+  parkId: string;
+  entityType: EntityType
+}

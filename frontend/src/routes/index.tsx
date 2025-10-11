@@ -1,13 +1,15 @@
-import { getLiveParkData } from '@/api/parks';
+import { getLiveData } from '@/api/parks';
 import ParkPreview from '@/components/ParkPreview';
-import type { EntityLiveDataResponse } from '@/types/parks-api';
+import { WALT_DISNEY_ENTITY_ID } from '@/constants';
+import type { EntityLiveDataResponse, LiveDataParams } from '@/types/parks-api';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/')({
   loader: ({ context: { queryClient } }) => {
+    const params: LiveDataParams = { parkId: WALT_DISNEY_ENTITY_ID, entityType: 'PARK' };
     return queryClient.ensureQueryData({
-      queryKey: ['liveData'],
-      queryFn: () => getLiveParkData(),
+      queryKey: ['liveData', params],
+      queryFn: () => getLiveData(params),
     });
   },
   component: App,

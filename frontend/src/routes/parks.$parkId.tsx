@@ -9,10 +9,11 @@ export const Route = createFileRoute('/parks/$parkId')({
 });
 
 function ParkLiveData() {
+  const entityType = 'ATTRACTION';
   const { parkId } = Route.useParams();
   const { data } = useQuery<EntityLiveDataResponse>({
-    queryKey: ['liveData', parkId],
-    queryFn: () => getLiveData(parkId),
+    queryKey: ['liveData', parkId, entityType],
+    queryFn: () => getLiveData({ parkId, entityType }),
     refetchInterval: 5 * 60 * 1000, // 5 minutes
   });
 
