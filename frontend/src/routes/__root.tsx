@@ -1,5 +1,6 @@
 import { Outlet, createRootRouteWithContext } from '@tanstack/react-router';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
+import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools';
 import MainNavigation from '@/components/MainNavigation';
 import type { QueryClient } from '@tanstack/react-query';
@@ -22,6 +23,10 @@ export const Route = createRootRouteWithContext<RouterContext>()({
           {
             name: 'Tanstack Router',
             render: <TanStackRouterDevtoolsPanel />,
+          },
+          {
+            name: 'React Query',
+            render: <ReactQueryDevtoolsPanel />,
           },
         ]}
       />)}
