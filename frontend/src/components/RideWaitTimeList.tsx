@@ -1,7 +1,7 @@
 import RidePreview from './RidePreview';
 import type { EntityLiveData } from '@/types/parks-api';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ArrowDownIcon, ArrowUpIcon } from 'lucide-react';
 import { Button } from './ui/button';
 import spacetime from 'spacetime';
@@ -9,66 +9,68 @@ import { Input } from '@/components/ui/input';
 
 type SortCategory = 'waitTime' | 'name' | 'lastUpdatedMinutes';
 
-export default function RideWaitTimeList({ liveData, timezone }: { liveData: Array<EntityLiveData>, timezone: string }) {
+export default function RideWaitTimeList({
+  liveData,
+  timezone,
+}: {
+  liveData: Array<EntityLiveData>;
+  timezone: string;
+}) {
   const [searchTerm, setSearchTerm] = useState('');
   const [sort, setSort] = useState<{ direction: 'asc' | 'desc'; category: SortCategory }>({
     direction: 'asc',
     category: 'lastUpdatedMinutes',
   });
 
-  const calcLastUpdated = useCallback(
-    (ride: EntityLiveData) => {
-      const lastUpdated = spacetime(ride.lastUpdated);
-      const now = spacetime.now(timezone);
-      const diff = lastUpdated.diff(now);
+  function calcLastUpdated(ride: EntityLiveData): number {
+    const lastUpdated = spacetime(ride.lastUpdated);
+    const now = spacetime.now(timezone);
+    const diff = lastUpdated.diff(now);
+    if (diff.hours > 0) {
+      return diff.hours * 60 + diff.minutes;
+    } else {
+      return diff.minutes;
+    }
+  }
 
-      if (diff.hours > 0) {
-        return diff.hours * 60 + diff.minutes;
-      } else {
-        return diff.minutes;
-      }
-    },
-    [timezone]
-  );
-
-  const rideData = useMemo(() => {
-    const mappedData = liveData.map((ride) => {
+  const mappedData = useMemo(() => {
+    return liveData.map((ride) => {
       const waitTime = ride.queue?.STANDBY?.waitTime || null;
       return { ...ride, waitTime, lastUpdatedMinutes: calcLastUpdated(ride) };
     });
-    const openRides = mappedData.filter((ride) => ride.status === 'OPERATING' && ride.waitTime) || [];
-    const filteredRides = openRides.filter((ride) => ride.name.toLowerCase().includes(searchTerm.toLowerCase().trim()));
+  }, [liveData, timezone]);
 
-    return filteredRides;
-  }, [liveData, searchTerm, calcLastUpdated]);
+  const rideData = mappedData.filter((ride) => {
+    return (
+      ride.status === 'OPERATING' && ride.waitTime && ride.name.toLowerCase().includes(searchTerm.toLowerCase().trim())
+    );
+  });
 
-  const sortedRides = useMemo(() => {
-    return [...rideData].sort((a, b) => {
-      let aValue: number | string = 0;
-      let bValue: number | string = 0;
-      switch (sort.category) {
-        case 'waitTime':
-          aValue = a.waitTime || 0;
-          bValue = b.waitTime || 0;
-          break;
-        case 'name':
-          aValue = a.name.trim().toLocaleLowerCase().replace(`"`, '');
-          bValue = b.name.trim().toLocaleLowerCase().replace(`"`, '');
-          break;
-        case 'lastUpdatedMinutes':
-          aValue = a.lastUpdatedMinutes;
-          bValue = b.lastUpdatedMinutes;
-          break;
-        default:
-          aValue = a.lastUpdatedMinutes;
-          bValue = b.lastUpdatedMinutes;
-          break;
-      }
-      if (aValue < bValue) return sort.direction === 'asc' ? -1 : 1;
-      if (aValue > bValue) return sort.direction === 'asc' ? 1 : -1;
-      return 0;
-    });
-  }, [rideData, sort]);
+  const sortedRides = [...rideData].sort((a, b) => {
+    let aValue: number | string = 0;
+    let bValue: number | string = 0;
+    switch (sort.category) {
+      case 'waitTime':
+        aValue = a.waitTime || 0;
+        bValue = b.waitTime || 0;
+        break;
+      case 'name':
+        aValue = a.name.trim().toLocaleLowerCase().replace(`"`, '');
+        bValue = b.name.trim().toLocaleLowerCase().replace(`"`, '');
+        break;
+      case 'lastUpdatedMinutes':
+        aValue = a.lastUpdatedMinutes;
+        bValue = b.lastUpdatedMinutes;
+        break;
+      default:
+        aValue = a.lastUpdatedMinutes;
+        bValue = b.lastUpdatedMinutes;
+        break;
+    }
+    if (aValue < bValue) return sort.direction === 'asc' ? -1 : 1;
+    if (aValue > bValue) return sort.direction === 'asc' ? 1 : -1;
+    return 0;
+  });
 
   function onSortCategoryChange(value: SortCategory) {
     setSort({ ...sort, category: value });
